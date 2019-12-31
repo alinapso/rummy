@@ -20,19 +20,17 @@ class _NewGameState extends State<NewGame> {
     fields.add(generateField());
   }
   Widget generateField() {
-    return Container(
-      child: TextFormField(
-        decoration: const InputDecoration(
-          hintText: 'Enter Player Name',
-        ),
-        validator: (value) {
-          if (value.isEmpty) {
-            return 'Please enter some text';
-          }
-          return null;
-        },
-        onSaved: (input) => {players.add(Player(input))},
+    return TextFormField(
+      decoration: const InputDecoration(
+        hintText: 'Enter Player Name',
       ),
+      onSaved: (input) => {players.add(Player(input))},
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter some text';
+        }
+        return null;
+      },
     );
   }
 
@@ -42,55 +40,79 @@ class _NewGameState extends State<NewGame> {
       body: SizedBox.expand(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Form(
+          child: Column(
+            children: <Widget>[
+              Form(
                   key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Column(
-                        children: fields,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RaisedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState.validate()) {
-                                    _formKey.currentState.save();
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              GameScreen(players),
-                                        ));
-                                  }
+                  child: Expanded(
+                    child: ListView(
+                      children: <Widget>[
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height,
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              return ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: fields.length,
+                                itemBuilder:
+                                    (BuildContext context, int postion) {
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: fields[postion],
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel),
+                                        onPressed: () => {
+                                          setState(() {
+                                            print(postion);
+                                            fields.removeAt(postion);
+                                          })
+                                        },
+                                      ),
+                                    ],
+                                  );
                                 },
-                                child: Text('Submit'),
-                              ),
-                              RaisedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    fields.add(generateField());
-                                  });
-                                },
-                                child: Text('Add New Player'),
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                        ),
-                      ),
-                    ],
+                        )
+                      ],
+                    ),
+                  )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    onPressed: () {
+                      print("asdasd");
+                      if (_formKey.currentState.validate()) {
+                        players.clear();
+                        _formKey.currentState.save();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GameScreen(players),
+                            ));
+                      } else
+                        print(_formKey.currentState.validate());
+                    },
+                    child: Text('Submit'),
                   ),
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
-            ),
+                  RaisedButton(
+                    onPressed: () {
+                      setState(() {
+                        fields.add(generateField());
+                      });
+                    },
+                    child: Text('Add New Player'),
+                  ),
+                ],
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
           ),
         ),
       ),

@@ -28,7 +28,9 @@ class _GameScreenState extends State<GameScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
       ),
-      body: SizedBox.expand(),
+      body: SizedBox.expand(
+        child: Text(players.length.toString()),
+      ),
     );
   }
 }
