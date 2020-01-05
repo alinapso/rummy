@@ -1,8 +1,8 @@
 class Player {
-  String id;
+  int id;
   String name;
   Player(
-    this.name, {
+    this.name,
     this.id,
-  });
+  );
 }

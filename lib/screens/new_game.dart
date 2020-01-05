@@ -24,7 +24,7 @@ class _NewGameState extends State<NewGame> {
       decoration: const InputDecoration(
         hintText: 'Enter Player Name',
       ),
-      onSaved: (input) => {players.add(Player(input))},
+      onSaved: (input) => {players.add(Player(input, players.length))},
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter some text';
@@ -87,7 +87,6 @@ class _NewGameState extends State<NewGame> {
                 children: <Widget>[
                   RaisedButton(
                     onPressed: () {
-                      print("asdasd");
                       if (_formKey.currentState.validate()) {
                         players.clear();
                         _formKey.currentState.save();
