@@ -4,6 +4,7 @@ import 'package:rummy/widgets/ShowAlertBox.dart';
 import '../models/round.dart';
 import 'add_round.dart';
 import 'menu.dart';
+import '../widgets/score_table_row.dart';
 
 class GameScreen extends StatefulWidget {
   final List<Player> players;
@@ -15,87 +16,82 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   List<Player> players;
-  List<TableRow> roundsTable;
+  List<Widget> table;
   List<Round> rounds;
-  List<Widget> scoreRow;
-  List<int> scores;
+
   _GameScreenState(this.players) {
     init();
-    createScoreRow();
   }
   init() {
-    roundsTable = new List();
-    scoreRow = new List();
-    scores = new List();
+    table = new List();
     rounds = new List();
   }
 
-  createScoreRow() {
-    for (int i = 0; i < players.length; i++) {
-      scores.add(0);
-    }
-  }
-
-  renderScoresTable() {
-    roundsTable.clear();
-    roundsTable.add(createTitle());
-    rounds.forEach((r) => {roundsTable.add(createRoundRow(r))});
-  }
-
-  TableRow createRoundRow(Round round) {
-    List<TableCell> cells = new List();
-    round.points.forEach((r) => {
-          cells.add(TableCell(
-            child: Container(
-              decoration: BoxDecoration(color: Colors.green),
-              height: 50.0,
-              child: Center(
-                child: Text(
-                  r.toString(),
-                  style: TextStyle(fontSize: 25),
-                ),
-              ),
-            ),
-          ))
-        });
-    return TableRow(children: cells);
-  }
-
-  renderScoreRow() {
-    scoreRow.clear();
-    for (int i = 0; i < players.length; i++) {
-      scoreRow.add(createScoreElement(scores[i]));
-    }
-  }
-
-  Widget createScoreElement(int score) {
-    return Expanded(
-      child: Center(
-        child: Text(
-          score.toString(),
-          style: TextStyle(fontSize: 25),
-        ),
-      ),
+  Widget createTitle() {
+    List<String> values = new List();
+    players.forEach((p) => {values.add(p.name)});
+    return ScoreTableRow(
+      values,
+      -1,
+      backgroundColor: Colors.orangeAccent,
+      textColor: Colors.white,
     );
   }
 
-  TableRow createTitle() {
-    List<TableCell> cells = new List();
-    players.forEach((p) => {
-          cells.add(TableCell(
-            child: Container(
-              decoration: BoxDecoration(color: Colors.grey),
-              height: 50.0,
-              child: Center(
-                child: Text(
-                  p.name,
-                  style: TextStyle(fontSize: 25),
-                ),
-              ),
-            ),
-          ))
-        });
-    return TableRow(children: cells);
+  Widget createScoreRow() {
+    List<String> values = new List();
+    List<int> scores = new List();
+    for (int i = 0; i < players.length; i++) {
+      int score = players[i].score - 100 * players[i].wins;
+      values.add(score.toString());
+      scores.add(score);
+    }
+    return ScoreTableRow(
+      values,
+      _findWinner(scores),
+      text: "סהכ",
+    );
+  }
+
+  renderTable() {
+    //Clear players score for recalculation
+    for (int i = 0; i < players.length; i++) players[i].clear();
+    //Clear table score for recalculation
+    table.clear();
+    //recreate table score
+
+    for (int i = 0; i < rounds.length; i++) {
+      table.add(new ScoreTableRow(
+          _calcScore(rounds[i]), _findWinner(rounds[i].points),
+          text: (i + 1).toString()));
+    }
+  }
+
+  int _findWinner(List<int> scores) {
+    int winner = -1;
+    bool tie = false;
+    int winnerTemp = 99999;
+    for (int i = 0; i < scores.length; i++) {
+      if (scores[i] == winnerTemp)
+        tie = true;
+      else if (scores[i] < winnerTemp) {
+        winner = i;
+        winnerTemp = scores[i];
+      }
+    }
+    if (tie) return -1;
+    return winner;
+  }
+
+  List<String> _calcScore(Round r) {
+    for (int i = 0; i < players.length; i++) {
+      players[i].score += (r.points[i] * r.multi).round();
+      if (r.points[i] < 0) {
+        players[i].wins++;
+      }
+    }
+
+    return convertToString();
   }
 
   _navigateAndDisplaySelection(BuildContext context) async {
@@ -108,31 +104,54 @@ class _GameScreenState extends State<GameScreen> {
     );
 
     setState(() {
-      rounds.add(result);
+      if (result != null) rounds.add(result);
     });
+  }
+
+  List<String> convertToString() {
+    List<String> strs = new List();
+    players.forEach((p) => {strs.add(p.score.toString())});
+    return strs;
   }
 
   @override
   Widget build(BuildContext context) {
-    renderScoresTable();
-    renderScoreRow();
+    renderTable();
+
     return WillPopScope(
       child: Scaffold(
+        appBar: AppBar(
+          title: Center(child: const Text("lets go!")),
+        ),
         body: SizedBox.expand(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              children: <Widget>[
-                Container(
+            child: Container(
+              //color: Colors.grey[300],
+              child: Column(
+                children: <Widget>[
+                  createTitle(),
+                  Container(
+                    height: 4,
+                    color: Colors.black38,
+                  ), //make this not rendering every time
+                  ConstrainedBox(
+                    constraints: new BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height - 200.0,
+                    ),
                     child: SingleChildScrollView(
-                        child: Table(children: roundsTable))),
-                Container(
-                  child: Row(
-                    children: scoreRow,
+                      child: Column(
+                        children: table,
+                      ),
+                    ),
                   ),
-                  height: 60,
-                )
-              ],
+                  Container(
+                    height: 4,
+                    color: Colors.black38,
+                  ),
+                  createScoreRow(),
+                ],
+              ),
             ),
           ),
         ),

@@ -15,7 +15,7 @@ showAlertDialog(BuildContext context, String text, Function fAction()) {
 
   // set up the AlertDialog
   AlertDialog alert = AlertDialog(
-    title: Text("AlertDialog"),
+    title: Text("Are you sure?"),
     content: Text(text),
     actions: [
       cancelButton,

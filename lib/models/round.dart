@@ -7,6 +7,7 @@ class Round {
     for (int i = 0; i < points.length; i++) {
       s += points[i].toString() + " ";
     }
+    s += " ," + multi.toString();
     return s;
   }
 }

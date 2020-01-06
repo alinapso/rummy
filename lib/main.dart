@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rummy/screens/menu.dart';
+import 'package:rummy/screens/new_game.dart';
+
+import 'models/player.dart';
 
 void main() => runApp(MyApp());
 
