@@ -61,9 +61,14 @@ class _GameScreenState extends State<GameScreen> {
     //recreate table score
 
     for (int i = 0; i < rounds.length; i++) {
-      table.add(new ScoreTableRow(
-          _calcScore(rounds[i]), _findWinner(rounds[i].points),
-          text: (i + 1).toString()));
+      table.add(InkWell(
+        onDoubleTap: () {
+          _navigateAndDisplaySelection(context, round: rounds[i], roundId: i);
+        },
+        child: ScoreTableRow(
+            _calcScore(rounds[i]), _findWinner(rounds[i].points),
+            text: (i + 1).toString()),
+      ));
     }
   }
 
@@ -94,17 +99,24 @@ class _GameScreenState extends State<GameScreen> {
     return convertToString();
   }
 
-  _navigateAndDisplaySelection(BuildContext context) async {
+  _navigateAndDisplaySelection(BuildContext context,
+      {Round round, int roundId}) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
     Round result = await Navigator.push(
       context,
       // Create the SelectionScreen in the next step.
-      MaterialPageRoute(builder: (context) => AddRound(this.players)),
+      MaterialPageRoute(
+          builder: (context) => AddRound(
+                this.players,
+                round: round,
+              )),
     );
 
     setState(() {
-      if (result != null) rounds.add(result);
+      if (result != null && round != null) {
+        rounds[roundId] = result;
+      } else if (result != null) rounds.add(result);
     });
   }
 
@@ -165,11 +177,12 @@ class _GameScreenState extends State<GameScreen> {
       ),
       onWillPop: () {
         showAlertDialog(context, "Would you like to end this game?", () {
-          Navigator.push(
-            context,
-            // Create the SelectionScreen in the next step.
-            MaterialPageRoute(builder: (context) => Menu()),
-          );
+          Navigator.pushReplacement(
+              context,
+              // Create the SelectionScreen in the next step.
+              MaterialPageRoute(
+                builder: (context) => Menu(),
+              ));
           return;
         });
 

@@ -5,24 +5,32 @@ import 'package:rummy/models/round.dart';
 
 class AddRound extends StatefulWidget {
   final List<Player> players;
-
-  AddRound(this.players, {Key key}) : super(key: key);
+  final Round round;
+  AddRound(this.players, {Key key, this.round}) : super(key: key);
 
   @override
-  _AddRoundState createState() => _AddRoundState(players);
+  _AddRoundState createState() => _AddRoundState(players, round: round);
 }
 
 class _AddRoundState extends State<AddRound> {
+  final Round round;
   final List<Player> players;
   List<AddRoundControler> controllers;
   final _formKey = GlobalKey<FormState>();
   List<Widget> fields;
   int dropdownValue = 100;
-  _AddRoundState(this.players) {
+  _AddRoundState(this.players, {this.round}) {
     controllers = new List();
 
     for (int i = 0; i < players.length; i++) {
       controllers.add(new AddRoundControler());
+    }
+    if (round != null) {
+      for (int i = 0; i < players.length; i++) {
+        controllers[i].text.text = round.points[i].toString();
+        controllers[i].checkd = round.points[i] == -20;
+        dropdownValue = (round.multi * 100).round();
+      }
     }
   }
   bool isNumeric(String s) {
