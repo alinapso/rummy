@@ -50,10 +50,10 @@ class _NewGameState extends State<NewGame> {
         autofocus: true,
         focusNode: controllers[controllers.length - 1].focus,
         controller: controllers[controllers.length - 1].txt,
-        textInputAction: TextInputAction.done,
+        textInputAction: TextInputAction.next,
         onFieldSubmitted: (term) {
           controllers[position].focus.unfocus();
-          if (controllers.length - 1 < position)
+          if (controllers.length > position + 1)
             FocusScope.of(context)
                 .requestFocus(controllers[position + 1].focus);
         });
@@ -128,6 +128,10 @@ class _NewGameState extends State<NewGame> {
                               onPressed: () {
                                 setState(() {
                                   fields.add(generateField(controllers.length));
+                                  if (controllers.length > 1)
+                                    controllers[controllers.length - 2]
+                                        .focus
+                                        .unfocus();
                                   FocusScope.of(context).requestFocus(
                                       controllers[controllers.length - 1]
                                           .focus);

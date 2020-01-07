@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rummy/models/add_round_controller.dart';
 import 'package:rummy/models/player.dart';
 import 'package:rummy/models/round.dart';
+import 'package:rummy/widgets/ShowAlertBox.dart';
 
 class AddRound extends StatefulWidget {
   final List<Player> players;
@@ -38,6 +39,14 @@ class _AddRoundState extends State<AddRound> {
       return false;
     }
     return int.tryParse(s) != null;
+  }
+
+  int getWinnerCount() {
+    int winnerCounter = 0;
+    for (int i = 0; i < controllers.length; i++) {
+      if (controllers[i].checkd) winnerCounter++;
+    }
+    return winnerCounter;
   }
 
   Widget generateField(int position) {
@@ -165,6 +174,16 @@ class _AddRoundState extends State<AddRound> {
                             RaisedButton(
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
+                                  int winnerCount = getWinnerCount();
+                                  if (winnerCount == 0) {
+                                    showAlertDialog(context,
+                                        "Some one need to win the round!");
+                                    return;
+                                  } else if (winnerCount > 1) {
+                                    showAlertDialog(
+                                        context, "There could be one winner!");
+                                    return;
+                                  }
                                   _formKey.currentState.save();
                                   List<int> scores = new List();
                                   controllers.forEach((c) =>

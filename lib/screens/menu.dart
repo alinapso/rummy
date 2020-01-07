@@ -23,7 +23,8 @@ class _MenuState extends State<Menu> {
               FlatButton(
                 child: Text("Start New Game!"),
                 onPressed: () {
-                  Navigator.push(
+                  //need to be replecet sense in the next screen there will be no menu to come to
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => NewGame(),
@@ -35,7 +36,7 @@ class _MenuState extends State<Menu> {
         ),
       ),
       onWillPop: () {
-        showAlertDialog(context, "Are you sure you want to exit?", () {
+        showExitDialog(context, "Are you sure you want to exit?", () {
           SystemChannels.platform.invokeMethod('SystemNavigator.pop');
           return;
         });

@@ -63,11 +63,14 @@ class _GameScreenState extends State<GameScreen> {
     for (int i = 0; i < rounds.length; i++) {
       table.add(InkWell(
         onDoubleTap: () {
-          _navigateAndDisplaySelection(context, round: rounds[i], roundId: i);
+          _navigateToNewRound(context, round: rounds[i], roundId: i);
         },
         child: ScoreTableRow(
-            _calcScore(rounds[i]), _findWinner(rounds[i].points),
-            text: (i + 1).toString()),
+          _calcScore(rounds[i]),
+          _findWinner(rounds[i].points),
+          text: (i + 1).toString(),
+          backgroundColor: (i % 2 == 0) ? Colors.black12 : Colors.grey[100],
+        ),
       ));
     }
   }
@@ -99,8 +102,7 @@ class _GameScreenState extends State<GameScreen> {
     return convertToString();
   }
 
-  _navigateAndDisplaySelection(BuildContext context,
-      {Round round, int roundId}) async {
+  _navigateToNewRound(BuildContext context, {Round round, int roundId}) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
     Round result = await Navigator.push(
@@ -136,47 +138,44 @@ class _GameScreenState extends State<GameScreen> {
           title: Center(child: const Text("lets go!")),
         ),
         body: SizedBox.expand(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Container(
-              //color: Colors.grey[300],
-              child: Column(
-                children: <Widget>[
-                  createTitle(),
-                  Container(
-                    height: 4,
-                    color: Colors.black38,
-                  ), //make this not rendering every time
-                  ConstrainedBox(
-                    constraints: new BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 200.0,
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: table,
-                      ),
+          child: Container(
+            //color: Colors.grey[300],
+            child: Column(
+              children: <Widget>[
+                createTitle(),
+                Container(
+                  height: 4,
+                  color: Colors.black38,
+                ), //make this not rendering every time
+                ConstrainedBox(
+                  constraints: new BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height - 200.0,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: table,
                     ),
                   ),
-                  Container(
-                    height: 4,
-                    color: Colors.black38,
-                  ),
-                  createScoreRow(),
-                ],
-              ),
+                ),
+                Container(
+                  height: 4,
+                  color: Colors.black38,
+                ),
+                createScoreRow(),
+              ],
             ),
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            _navigateAndDisplaySelection(context);
+            _navigateToNewRound(context);
           },
           tooltip: 'Add New Round',
           child: const Icon(Icons.add),
         ),
       ),
       onWillPop: () {
-        showAlertDialog(context, "Would you like to end this game?", () {
+        showExitDialog(context, "Would you like to end this game?", () {
           Navigator.pushReplacement(
               context,
               // Create the SelectionScreen in the next step.

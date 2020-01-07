@@ -22,11 +22,8 @@ class ScoreTableRow extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Container(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 1),
-                child: Row(
-                  children: cells,
-                ),
+              child: Row(
+                children: cells,
               ),
             ),
           ),
@@ -54,7 +51,7 @@ Widget createScoreElement(String score, bool winner,
         child: Center(
           child: Text(
             score,
-            style: TextStyle(fontSize: 25, color: textColor),
+            style: TextStyle(fontSize: 20, color: textColor),
           ),
         ),
       ),
