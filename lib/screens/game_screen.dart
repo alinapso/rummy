@@ -85,6 +85,7 @@ class _GameScreenState extends State<GameScreen> {
       else if (scores[i] < winnerTemp) {
         winner = i;
         winnerTemp = scores[i];
+        tie = false;
       }
     }
     if (tie) return -1;
